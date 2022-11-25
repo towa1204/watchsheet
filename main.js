@@ -1,33 +1,34 @@
-const sample = {
+const user = {
   channel: {
     name: 'Yutani Ch',
     description: 'ひとまず関西を中心に様々な場所を訪れ、\nいずれは日本中を旅しながら動画を撮れたら良いなと思います',
+    url: 'https://youtube.com/channel/UC3jTHLb1p00XxwBTU2EilhA',
   },
   videos: [
     {
       title: '道頓堀のアレに今年も行ってきました',
       publishedAt: '2022/11/22',
-      videoId: 'https://www.youtube.com/watch?v=gghuQ1VCa4U',
+      url: 'https://www.youtube.com/watch?v=gghuQ1VCa4U',
     },
     {
       title: '見せてもらおうか、動くガンダムの性能とやらを… 第3次スーパーロボコス大展',
       publishedAt: '2022/11/15',
-      videoId: 'https://www.youtube.com/watch?v=I68MgfZsC6Q',
+      url: 'https://www.youtube.com/watch?v=I68MgfZsC6Q',
     },
     {
       title: '和歌浦の明光商店街と創業140年の本屋 まつき本店',
       publishedAt: '2022/11/08',
-      videoId: 'https://www.youtube.com/watch?v=lop2fTND6G8',
+      url: 'https://www.youtube.com/watch?v=lop2fTND6G8',
     },
     {
       title: '和歌山に行って日本一のラーメン食べてきた',
       publishedAt: '2022/10/29',
-      videoId: 'https://www.youtube.com/watch?v=hCdkm4lxLVA',
+      url: 'https://www.youtube.com/watch?v=hCdkm4lxLVA',
     },
     {
       title: '激シブ昭和レトロ！ 長吉銀座商店街',
       publishedAt: '2022/10/22',
-      videoId: 'https://www.youtube.com/watch?v=_Fp8lCMlL0w',
+      url: 'https://www.youtube.com/watch?v=_Fp8lCMlL0w',
     },
   ],
 };
@@ -46,11 +47,12 @@ function main() {
     channel: {
       name: string,
       description: string,
+      url: string,
     }
     videos: {
       title: string,
       publishedAt: string,
-      videoId: string,
+      url: string,
     }[]
   }
  */
@@ -91,13 +93,14 @@ function getWatchYouTubeChannel(channelId) {
         month: '2-digit',
         day: '2-digit',
       }),
-      videoId: `https://www.youtube.com/watch?v=${item.snippet.resourceId.videoId}`,
+      url: `https://www.youtube.com/watch?v=${item.snippet.resourceId.videoId}`,
     };
   });
 
   const channelInfo = {
     name: channel.items[0].snippet.title,
     description: channel.items[0].snippet.description,
+    url: `https://www.youtube.com/channel/${channelId}`,
   };
 
   return {
