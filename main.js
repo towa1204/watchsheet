@@ -101,6 +101,7 @@ function getWatchYouTubeChannel(channelId) {
   let token = null,
     items = [],
     requestNum = 0;
+  // 複数回リクエストして全動画の情報を格納する
   while (true) {
     const playlist = requestPlaylistItems(playlistId, token, MAX);
     items = [...items, ...playlist.items];
