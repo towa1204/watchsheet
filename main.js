@@ -37,8 +37,21 @@ function main() {
   // const channelId = 'UC3jTHLb1p00XxwBTU2EilhA';
   // const channel = getWatchYouTubeChannel(channelId);
   // console.log(channel);
+  // console.log(channelInfo);
 
-  console.log(sample);
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Yutani Ch');
+  const template = [
+    ['channel', 'description', 'url', 'comment', '', ''],
+    [user.channel.name, user.channel.description, user.channel.url, '', '', ''],
+    ['', '', '', '', '', ''],
+    ['posted date', 'title', 'url', 'views', 'rating', 'impression'],
+  ];
+  template.push(
+    ...user.videos.map((video) => {
+      return [video.publishedAt, video.title, video.url, 0, '', ''];
+    })
+  );
+  sheet.getRange(1, 1, template.length, 6).setValues(template);
 }
 
 /*
