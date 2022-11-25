@@ -1,4 +1,4 @@
-const user = {
+const userSample = {
   channel: {
     name: 'Yutani Ch',
     description: 'ひとまず関西を中心に様々な場所を訪れ、\nいずれは日本中を旅しながら動画を撮れたら良いなと思います',
@@ -35,23 +35,44 @@ const user = {
 
 function main() {
   // const channelId = 'UC3jTHLb1p00XxwBTU2EilhA';
-  // const channel = getWatchYouTubeChannel(channelId);
+  // const user = getWatchYouTubeChannel(channelId);
   // console.log(channel);
-  // console.log(channelInfo);
+  user = userSample;
 
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Yutani Ch');
+
   const template = [
     ['channel', 'description', 'url', 'comment', '', ''],
-    [user.channel.name, user.channel.description, user.channel.url, '', '', ''],
+    ['', '', '', '', '', ''],
     ['', '', '', '', '', ''],
     ['posted date', 'title', 'url', 'views', 'rating', 'impression'],
   ];
+  // チャンネル表のデータを埋め込む
+  template[1] = [user.channel.name, user.channel.description, user.channel.url, '', '', ''];
+  // ビデオ表のデータを埋め込む
   template.push(
     ...user.videos.map((video) => {
       return [video.publishedAt, video.title, video.url, 0, '', ''];
     })
   );
-  sheet.getRange(1, 1, template.length, 6).setValues(template);
+
+  const ROWNUM = template.length; // チャンネル・動画の表を含む行数
+  const COLUMNNUM = template[0].length; // チャンネル・動画の表を含む列数
+  const VIDEOSROWNUM = 4; // 動画のプロパティを表す列番号
+
+  // チャンネル・動画の表を作成
+  sheet.getRange(1, 1, ROWNUM, COLUMNNUM).setValues(template);
+
+  // 動画の表にフィルタを適用
+  sheet.getRange(VIDEOSROWNUM, 1, user.videos.length + 1, COLUMNNUM).createFilter();
+  sheet.getFilter().sort(1, true); // 日付を基準に昇順に並べる
+
+  // 表のプロパティを中央寄せ
+  sheet.getRange(1, 1, 1, COLUMNNUM).setHorizontalAlignment('center');
+  sheet.getRange(VIDEOSROWNUM, 1, 1, COLUMNNUM).setHorizontalAlignment('center');
+
+  // 列幅を自動調節（効いてないっぽい）
+  sheet.autoResizeColumns(1, COLUMNNUM);
 }
 
 /*
