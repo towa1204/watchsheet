@@ -33,6 +33,28 @@ const userSample = {
   ],
 };
 
+// 動画のURLからvideoIdを抜き出す関数
+function getChannelIdfromVideoURL(videoURL) {
+  const result = /^https:\/\/www\.youtube\.com\/watch\?v=(.+)$/.exec(videoURL);
+  if (result == null) return null;
+  return /\&/.exec(result[1]) == null ? result[1] : result[1].split('&')[0];
+}
+
+function InputVideolURL() {
+  const input = Browser.inputBox(
+    "YouTubeチャンネルの適当な動画のURLを入力してください．\nURLの形式は'https://www.youtube.com/watch?v='です．",
+    Browser.Buttons.OK_CANCEL
+  );
+  if (input === 'cancel') return;
+
+  const channelId = getChannelIdfromVideoURL(input);
+  if (channelId == null) {
+    Browser.msgBox("入力した文字列がURLの形式'https://www.youtube.com/watch?v='と一致しません．");
+    return;
+  }
+  console.log(channelId);
+}
+
 function main() {
   // const channelId = 'UC3jTHLb1p00XxwBTU2EilhA';
   // const user = getWatchYouTubeChannel(channelId);
@@ -158,3 +180,6 @@ function requestPlaylistItems(playlistId, token, max) {
 
   return YouTube.PlaylistItems.list('snippet', requestOptions);
 }
+
+// jest用
+// exports.getChannelIdfromVideoURL = getChannelIdfromVideoURL;
