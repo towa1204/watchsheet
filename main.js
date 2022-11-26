@@ -52,14 +52,20 @@ function InputVideolURL() {
     Browser.msgBox("入力した文字列がURLの形式'https://www.youtube.com/watch?v='と一致しません．");
     return;
   }
-  console.log(videoId);
+  const channelId = getChannelIdFromVideoId(videoId);
+  main(channelId);
 }
 
-function main() {
+function getChannelIdFromVideoId(videoId) {
+  const video = YouTube.Videos.list('snippet', { id: videoId });
+  return video.items[0].snippet.channelId;
+}
+
+function main(channelId) {
   // const channelId = 'UC3jTHLb1p00XxwBTU2EilhA';
-  // const user = getWatchYouTubeChannel(channelId);
+  const user = getWatchYouTubeChannel(channelId);
   // console.log(channel);
-  user = userSample;
+  // user = userSample;
 
   const template = [
     ['channel', 'description', 'url', 'comment', '', ''],
