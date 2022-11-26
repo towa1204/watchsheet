@@ -39,8 +39,6 @@ function main() {
   // console.log(channel);
   user = userSample;
 
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Yutani Ch');
-
   const template = [
     ['channel', 'description', 'url', 'comment', '', ''],
     ['', '', '', '', '', ''],
@@ -55,6 +53,12 @@ function main() {
       return [video.publishedAt, video.title, video.url, 0, '', ''];
     })
   );
+
+  // シートの作成
+  const SpreadSheet = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = SpreadSheet.insertSheet();
+  sheet.setName(user.channel.name);
+  // const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Yutani Ch');
 
   const ROWNUM = template.length; // チャンネル・動画の表を含む行数
   const COLUMNNUM = template[0].length; // チャンネル・動画の表を含む列数
