@@ -34,7 +34,7 @@ const userSample = {
 };
 
 // 動画のURLからvideoIdを抜き出す関数
-function getChannelIdfromVideoURL(videoURL) {
+function getVideoIdfromVideoURL(videoURL) {
   const result = /^https:\/\/www\.youtube\.com\/watch\?v=(.+)$/.exec(videoURL);
   if (result == null) return null;
   return /\&/.exec(result[1]) == null ? result[1] : result[1].split('&')[0];
@@ -182,4 +182,4 @@ function requestPlaylistItems(playlistId, token, max) {
 }
 
 // jest用
-// exports.getChannelIdfromVideoURL = getChannelIdfromVideoURL;
+// exports.getVideoIdfromVideoURL = getVideoIdfromVideoURL;

@@ -12,6 +12,6 @@ const url_id_pair = [
 
 url_id_pair.forEach((pair) => {
   test(`${pair[0]} -> ${pair[1]}`, () => {
-    expect(main.getChannelIdfromVideoURL(pair[0])).toBe(pair[1]);
+    expect(main.getVideoIdfromVideoURL(pair[0])).toBe(pair[1]);
   });
 });
