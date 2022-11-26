@@ -47,12 +47,12 @@ function InputVideolURL() {
   );
   if (input === 'cancel') return;
 
-  const channelId = getChannelIdfromVideoURL(input);
-  if (channelId == null) {
+  const videoId = getVideoIdfromVideoURL(input);
+  if (videoId == null) {
     Browser.msgBox("入力した文字列がURLの形式'https://www.youtube.com/watch?v='と一致しません．");
     return;
   }
-  console.log(channelId);
+  console.log(videoId);
 }
 
 function main() {
