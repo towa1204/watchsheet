@@ -185,5 +185,15 @@ function getVideoIdfromVideoURL(videoURL) {
   return /\&/.exec(result[1]) == null ? result[1] : result[1].split('&')[0];
 }
 
+// channelIdをもとに，すでにシートが存在するかチェック
+function isChannelTable(channelId) {
+  const SpreadSheet = SpreadsheetApp.getActiveSpreadsheet();
+  const sheets = SpreadSheet.getSheets();
+  for (let sheet of sheets) {
+    if (sheet.getRange('B2').getValue() === `https://www.youtube.com/channel/${channelId}`) return true;
+  }
+  return false;
+}
+
 // jest用
 // exports.getVideoIdfromVideoURL = getVideoIdfromVideoURL;
