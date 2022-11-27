@@ -68,13 +68,13 @@ function main(channelId) {
   // user = userSample;
 
   const template = [
-    ['channel', 'description', 'url', 'comment', '', ''],
+    ['channel', 'url', 'comment', '', '', ''],
     ['', '', '', '', '', ''],
     ['', '', '', '', '', ''],
     ['posted date', 'title', 'url', 'views', 'rating', 'impression'],
   ];
   // チャンネル表のデータを埋め込む
-  template[1] = [user.channel.name, user.channel.description, user.channel.url, '', '', ''];
+  template[1] = [user.channel.name, user.channel.url, '', '', '', ''];
   // ビデオ表のデータを埋め込む
   template.push(
     ...user.videos.map((video) => {
@@ -112,7 +112,6 @@ function main(channelId) {
   {
     channel: {
       name: string,
-      description: string,
       url: string,
     }
     videos: {
@@ -166,7 +165,6 @@ function getWatchYouTubeChannel(channelId) {
 
   const channelInfo = {
     name: channel.items[0].snippet.title,
-    description: channel.items[0].snippet.description,
     url: `https://www.youtube.com/channel/${channelId}`,
   };
 
