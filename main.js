@@ -35,7 +35,7 @@ const userSample = {
 
 function InputVideolURL() {
   const input = Browser.inputBox(
-    "YouTubeチャンネルの適当な動画のURLを入力してください．\nURLの形式は'https://www.youtube.com/watch?v='です．",
+    "YouTubeチャンネルの適当な動画のURLを入力してください．\\nURLの形式は'https://www.youtube.com/watch?v='です．",
     Browser.Buttons.OK_CANCEL
   );
   if (input === 'cancel') return;
@@ -46,7 +46,12 @@ function InputVideolURL() {
     return;
   }
   const channelId = getChannelIdFromVideoId(videoId);
-  InitChannelTable(channelId);
+  if (isChannelTable(channelId)) {
+    // TODO: 最新の動画情報を取得する処理
+    Browser.msgBox('既にシートが存在します．');
+  } else {
+    InitChannelTable(channelId);
+  }
 }
 
 function InitChannelTable(channelId) {
@@ -133,7 +138,7 @@ function getWatchYouTubeChannel(channelId) {
     if (requestNum > playlist.pageInfo.totalResults / playlist.pageInfo.resultsPerPage) break;
 
     /* 調整 */
-    if (requestNum == 1) break;
+    // if (requestNum == 1) break;
   }
   console.log(`APIへのリクエスト回数：${requestNum}`);
   console.log(`動画数：${items.length}`);
