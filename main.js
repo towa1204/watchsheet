@@ -53,7 +53,7 @@ function InputVideolURL() {
     return;
   }
   const channelId = getChannelIdFromVideoId(videoId);
-  main(channelId);
+  InitChannelTable(channelId);
 }
 
 function getChannelIdFromVideoId(videoId) {
@@ -61,7 +61,7 @@ function getChannelIdFromVideoId(videoId) {
   return video.items[0].snippet.channelId;
 }
 
-function main(channelId) {
+function InitChannelTable(channelId) {
   // const channelId = 'UC3jTHLb1p00XxwBTU2EilhA';
   const user = getWatchYouTubeChannel(channelId);
   // console.log(channel);
