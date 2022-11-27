@@ -33,13 +33,6 @@ const userSample = {
   ],
 };
 
-// 動画のURLからvideoIdを抜き出す関数
-function getVideoIdfromVideoURL(videoURL) {
-  const result = /^https:\/\/www\.youtube\.com\/watch\?v=(.+)$/.exec(videoURL);
-  if (result == null) return null;
-  return /\&/.exec(result[1]) == null ? result[1] : result[1].split('&')[0];
-}
-
 function InputVideolURL() {
   const input = Browser.inputBox(
     "YouTubeチャンネルの適当な動画のURLを入力してください．\nURLの形式は'https://www.youtube.com/watch?v='です．",
@@ -54,11 +47,6 @@ function InputVideolURL() {
   }
   const channelId = getChannelIdFromVideoId(videoId);
   InitChannelTable(channelId);
-}
-
-function getChannelIdFromVideoId(videoId) {
-  const video = YouTube.Videos.list('snippet', { id: videoId });
-  return video.items[0].snippet.channelId;
 }
 
 function InitChannelTable(channelId) {
@@ -183,6 +171,18 @@ function requestPlaylistItems(playlistId, token, max) {
   console.log(requestOptions);
 
   return YouTube.PlaylistItems.list('snippet', requestOptions);
+}
+
+function getChannelIdFromVideoId(videoId) {
+  const video = YouTube.Videos.list('snippet', { id: videoId });
+  return video.items[0].snippet.channelId;
+}
+
+// 動画のURLからvideoIdを抜き出す関数
+function getVideoIdfromVideoURL(videoURL) {
+  const result = /^https:\/\/www\.youtube\.com\/watch\?v=(.+)$/.exec(videoURL);
+  if (result == null) return null;
+  return /\&/.exec(result[1]) == null ? result[1] : result[1].split('&')[0];
 }
 
 // jest用
