@@ -144,17 +144,20 @@ function getWatchYouTubeChannel(channelId) {
   console.log(`動画数：${items.length}`);
 
   // 取得したデータから [タイトル，投稿日，動画URL] の配列 を作る
-  const videoInfo = items.map((item) => {
-    return {
-      title: item.snippet.title,
-      publishedAt: new Date(item.snippet.publishedAt).toLocaleDateString('ja-JP', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-      }),
-      url: `https://www.youtube.com/watch?v=${item.snippet.resourceId.videoId}`,
-    };
-  });
+  // 配列の要素の順序は日付が古いものから新しいもの順
+  const videoInfo = items
+    .map((item) => {
+      return {
+        title: item.snippet.title,
+        publishedAt: new Date(item.snippet.publishedAt).toLocaleDateString('ja-JP', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+        }),
+        url: `https://www.youtube.com/watch?v=${item.snippet.resourceId.videoId}`,
+      };
+    })
+    .reverse();
 
   const channelInfo = {
     name: channel.items[0].snippet.title,
