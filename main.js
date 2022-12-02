@@ -94,54 +94,6 @@ function updateChannelTable(channelId) {
   );
 }
 
-// videoIdと一致するものが見つかれば，それまでの配列を返し，見つからなければエラー
-function getDiffVideos(channelId, videoId) {
-  const MAX = 50;
-
-  // すべての動画をもつプレイリストIDを取得
-  const channel = YouTube.Channels.list('snippet,contentDetails', { id: channelId });
-  const playlistId = channel.items[0].contentDetails.relatedPlaylists.uploads;
-  // console.log(playlistId);
-
-  let token = null,
-    items = [],
-    requestNum = 0;
-  while (true) {
-    const playlist = requestPlaylistItems(playlistId, token, MAX);
-    items = [...items, ...playlist.items];
-
-    for (let i = items.length - playlist.items.length; i < items.length; i++) {
-      if (items[i].snippet.resourceId.videoId == videoId) {
-        return items
-          .slice(0, i)
-          .map((item) => {
-            return {
-              title: item.snippet.title,
-              publishedAt: new Date(item.snippet.publishedAt).toLocaleDateString('ja-JP', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-              }),
-              url: `https://www.youtube.com/watch?v=${item.snippet.resourceId.videoId}`,
-            };
-          })
-          .reverse();
-      }
-    }
-
-    token = playlist.nextPageToken;
-    requestNum++;
-    if (token == null) break;
-
-    /* エラー対策 */
-    if (requestNum > playlist.pageInfo.totalResults / playlist.pageInfo.resultsPerPage) break;
-
-    /* 調整 */
-    // if (requestNum == 1) break;
-  }
-  return null;
-}
-
 function initChannelTable(channelId) {
   // const channelId = 'UC3jTHLb1p00XxwBTU2EilhA';
   const user = getWatchYouTubeChannel(channelId);
@@ -256,6 +208,54 @@ function getWatchYouTubeChannel(channelId) {
     channel: channelInfo,
     videos: videoInfo,
   };
+}
+
+// videoIdの動画より新しい動画の情報を取得
+function getDiffVideos(channelId, videoId) {
+  const MAX = 50;
+
+  // すべての動画をもつプレイリストIDを取得
+  const channel = YouTube.Channels.list('snippet,contentDetails', { id: channelId });
+  const playlistId = channel.items[0].contentDetails.relatedPlaylists.uploads;
+  // console.log(playlistId);
+
+  let token = null,
+    items = [],
+    requestNum = 0;
+  while (true) {
+    const playlist = requestPlaylistItems(playlistId, token, MAX);
+    items = [...items, ...playlist.items];
+
+    for (let i = items.length - playlist.items.length; i < items.length; i++) {
+      if (items[i].snippet.resourceId.videoId == videoId) {
+        return items
+          .slice(0, i)
+          .map((item) => {
+            return {
+              title: item.snippet.title,
+              publishedAt: new Date(item.snippet.publishedAt).toLocaleDateString('ja-JP', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+              }),
+              url: `https://www.youtube.com/watch?v=${item.snippet.resourceId.videoId}`,
+            };
+          })
+          .reverse();
+      }
+    }
+
+    token = playlist.nextPageToken;
+    requestNum++;
+    if (token == null) break;
+
+    /* エラー対策 */
+    if (requestNum > playlist.pageInfo.totalResults / playlist.pageInfo.resultsPerPage) break;
+
+    /* 調整 */
+    // if (requestNum == 1) break;
+  }
+  return null;
 }
 
 function requestPlaylistItems(playlistId, token, max) {
