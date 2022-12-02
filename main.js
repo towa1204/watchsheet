@@ -61,36 +61,37 @@ function updateChannelTable(channelId) {
     return;
   }
   const range = filter.getRange();
-  console.log(`${range.getRow()}:${range.getColumn()}, ${range.getLastRow()}: ${range.getLastColumn()}`);
+  console.log(
+    `フィルタの範囲　左上：(${range.getRow()}, ${range.getColumn()}), 左下：(${range.getLastRow()}, ${range.getLastColumn()})`
+  );
 
-  // フィルタ範囲の値を取り出して日付でソートし最新のurl(videoId)を取得する
+  // フィルタ範囲の値を取り出して日付でソートし最新のvideoidを取得する
   const videos = range.getValues();
   videos.shift(); // 表の項目の配列を削除
   videos.sort((a, b) => {
     return a[0] < b[0] ? 1 : -1;
   });
+  const latestVideoId = getVideoIdfromVideoURL(videos[0][2]);
+  console.log(`更新前の最新のvideoid: ${latestVideoId}`);
 
   // urlと一致するものが見つかれば，それまでの配列を返し，見つからなければエラー
-  const latestVideoId = getVideoIdfromVideoURL(videos[0][2]);
-  const latestVideoInfo = getDiffVideos(channelId, latestVideoId);
-  console.log(`更新前の最新のvideoid = ${latestVideoId}`);
-  console.log(`最新の動画数 = ${latestVideoInfo.length}`);
-  console.log(latestVideoInfo);
-  if (latestVideoInfo.length === 0) {
+  const newVideoInfo = getDiffVideos(channelId, latestVideoId);
+  console.log(`新しく追加する動画数: ${newVideoInfo.length}`);
+
+  if (newVideoInfo.length === 0) {
     Browser.msgBox('すでに最新です．');
     return;
   } else if (latestVideoId == null) {
     Browser.msgBox('エラーが発生しました．');
     return;
   }
-  sheet.getRange(range.getLastRow() + 1, range.getColumn(), latestVideoInfo.length, range.getLastColumn()).setValues(
-    latestVideoInfo.map((video) => {
+
+  // シートの末尾に動画の情報を追加(フィルタは自動で適用される)
+  sheet.getRange(range.getLastRow() + 1, range.getColumn(), newVideoInfo.length, range.getLastColumn()).setValues(
+    newVideoInfo.map((video) => {
       return [video.publishedAt, video.title, video.url, 0, '', ''];
     })
   );
-
-  // フィルタの削除/適用?
-  // ソートしなおす必要がある
 }
 
 // videoIdと一致するものが見つかれば，それまでの配列を返し，見つからなければエラー
