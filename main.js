@@ -34,22 +34,19 @@ const userSample = {
 };
 
 function InputVideoURL() {
-  const input = Browser.inputBox(
+  const url = Browser.inputBox(
     "YouTubeチャンネルの適当な動画のURLを入力してください．\\nURLの形式は'https://www.youtube.com/watch?v='です．",
     Browser.Buttons.OK_CANCEL
   );
-  if (input === 'cancel') return;
+  if (url === 'cancel') return;
 
-  const videoId = getVideoIdfromVideoURL(input);
+  const videoId = getVideoIdfromVideoURL(url);
   if (videoId == null) {
     Browser.msgBox("入力した文字列がURLの形式'https://www.youtube.com/watch?v='と一致しません．");
     return;
   }
   const channelId = getChannelIdFromVideoId(videoId);
   if (getChannelTableSheet(channelId) != null) {
-    // TODO: 最新の動画情報を取得する処理
-    // Browser.msgBox('既にシートが存在します．');
-    console.log('シートを更新します．');
     updateChannelTable(channelId);
   } else {
     initChannelTable(channelId);
