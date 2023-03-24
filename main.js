@@ -1,62 +1,35 @@
 function InputVideoURL() {
   const url = Browser.inputBox(
-    "YouTubeチャンネルの適当な動画のURLを入力してください．\\nURLの形式は'https://www.youtube.com/watch?v='です．",
+    `YouTubeチャンネルの適当な動画のURLを入力してください.\\n
+     URLの形式は'https://www.youtube.com/watch?v='です.`,
     Browser.Buttons.OK_CANCEL
   );
   if (url === 'cancel') return;
 
-  const videoId = getVideoIdfromVideoURL(url);
+  const videoId = extractVideoId(url);
   if (videoId == null) {
     Browser.msgBox("入力した文字列がURLの形式'https://www.youtube.com/watch?v='と一致しません．");
     return;
   }
-  const channelId = getChannelIdFromVideoId(videoId);
-  if (getChannelTableSheet(channelId) != null) {
-    updateChannelTable(channelId);
-  } else {
+  const channelId = fetchChannelId(videoId);
+
+  if (getChannelTableSheet(channelId) == null) {
     initChannelTable(channelId);
+  } else {
+    updateChannelTable(channelId);
   }
 }
 
-function updateChannelTable(channelId) {
-  const sheet = getChannelTableSheet(channelId);
-  const filter = sheet.getFilter();
-  if (filter == null) {
-    Browser.msgBox('フィルターが設定されていません．');
-    return;
+// channelIdをもとに，すでにシートが存在するかチェック
+function getChannelTableSheet(channelId) {
+  const SpreadSheet = SpreadsheetApp.getActiveSpreadsheet();
+  const sheets = SpreadSheet.getSheets();
+  for (let sheet of sheets) {
+    if (sheet.getRange('B2').getValue() === `https://www.youtube.com/channel/${channelId}`) {
+      return sheet;
+    }
   }
-  const range = filter.getRange();
-  console.log(
-    `フィルタの範囲　左上：(${range.getRow()}, ${range.getColumn()}), 左下：(${range.getLastRow()}, ${range.getLastColumn()})`
-  );
-
-  // フィルタ範囲の値を取り出して日付でソートし最新のvideoidを取得する
-  const videos = range.getValues();
-  videos.shift(); // 表の項目の配列を削除
-  videos.sort((a, b) => {
-    return a[0] < b[0] ? 1 : -1;
-  });
-  const latestVideoId = getVideoIdfromVideoURL(videos[0][2]);
-  console.log(`更新前の最新のvideoid: ${latestVideoId}`);
-
-  // urlと一致するものが見つかれば，それまでの配列を返し，見つからなければエラー
-  const newVideoInfo = getDiffVideos(channelId, latestVideoId);
-  console.log(`新しく追加する動画数: ${newVideoInfo.length}`);
-
-  if (newVideoInfo.length === 0) {
-    Browser.msgBox('すでに最新です．');
-    return;
-  } else if (latestVideoId == null) {
-    Browser.msgBox('エラーが発生しました．');
-    return;
-  }
-
-  // シートの末尾に動画の情報を追加(フィルタは自動で適用される)
-  sheet.getRange(range.getLastRow() + 1, range.getColumn(), newVideoInfo.length, range.getLastColumn()).setValues(
-    newVideoInfo.map((video) => {
-      return [video.publishedAt, video.title, video.url, 0, '', ''];
-    })
-  );
+  return null;
 }
 
 function initChannelTable(channelId) {
@@ -105,6 +78,47 @@ function initChannelTable(channelId) {
   sheet.autoResizeColumns(1, COLUMNNUM);
 }
 
+function updateChannelTable(channelId) {
+  const sheet = getChannelTableSheet(channelId);
+  const filter = sheet.getFilter();
+  if (filter == null) {
+    Browser.msgBox('フィルターが設定されていません.');
+    return;
+  }
+  const range = filter.getRange();
+  console.log(
+    `フィルタの範囲 左上: (${range.getRow()}, ${range.getColumn()}), 左下: (${range.getLastRow()}, ${range.getLastColumn()})`
+  );
+
+  // フィルタ範囲の値を取り出して日付でソートし最新のvideoidを取得する
+  const videos = range.getValues();
+  videos.shift(); // 表の項目の配列を削除
+  videos.sort((a, b) => {
+    return a[0] < b[0] ? 1 : -1;
+  });
+  const latestVideoId = extractVideoId(videos[0][2]);
+  console.log(`更新前の最新のvideoid: ${latestVideoId}`);
+
+  // urlと一致するものが見つかれば，それまでの配列を返し，見つからなければエラー
+  const newVideoInfo = getDiffVideos(channelId, latestVideoId);
+  console.log(`新しく追加する動画数: ${newVideoInfo.length}`);
+
+  if (newVideoInfo.length === 0) {
+    Browser.msgBox('すでに最新です.');
+    return;
+  } else if (latestVideoId == null) {
+    Browser.msgBox('エラーが発生しました.');
+    return;
+  }
+
+  // シートの末尾に動画の情報を追加(フィルタは自動で適用される)
+  sheet.getRange(range.getLastRow() + 1, range.getColumn(), newVideoInfo.length, range.getLastColumn()).setValues(
+    newVideoInfo.map((video) => {
+      return [video.publishedAt, video.title, video.url, 0, '', ''];
+    })
+  );
+}
+
 /*
   次のオブジェクトを返す
   {
@@ -145,8 +159,8 @@ function getWatchYouTubeChannel(channelId) {
     /* 調整 */
     // if (requestNum == 1) break;
   }
-  console.log(`APIへのリクエスト回数：${requestNum}`);
-  console.log(`動画数：${items.length}`);
+  console.log(`APIへのリクエスト回数: ${requestNum}`);
+  console.log(`動画数: ${items.length}`);
 
   // 取得したデータから [タイトル，投稿日，動画URL] の配列 を作る
   // 配列の要素の順序は日付が古いものから新しいもの順
@@ -233,30 +247,3 @@ function requestPlaylistItems(playlistId, token, max) {
 
   return YouTube.PlaylistItems.list('snippet', requestOptions);
 }
-
-function getChannelIdFromVideoId(videoId) {
-  const video = YouTube.Videos.list('snippet', { id: videoId });
-  return video.items[0].snippet.channelId;
-}
-
-// 動画のURLからvideoIdを抜き出す関数
-function getVideoIdfromVideoURL(videoURL) {
-  const result = /^https:\/\/www\.youtube\.com\/watch\?v=(.+)$/.exec(videoURL);
-  if (result == null) return null;
-  return /\&/.exec(result[1]) == null ? result[1] : result[1].split('&')[0];
-}
-
-// channelIdをもとに，すでにシートが存在するかチェック
-function getChannelTableSheet(channelId) {
-  const SpreadSheet = SpreadsheetApp.getActiveSpreadsheet();
-  const sheets = SpreadSheet.getSheets();
-  for (let sheet of sheets) {
-    if (sheet.getRange('B2').getValue() === `https://www.youtube.com/channel/${channelId}`) {
-      return sheet;
-    }
-  }
-  return null;
-}
-
-// jest用
-// exports.getVideoIdfromVideoURL = getVideoIdfromVideoURL;

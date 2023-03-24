@@ -1,6 +1,6 @@
 // テストするときはmain.jsのexport部分をコメントアウトすること
 
-const main = require('../main');
+const main = require('../youtube-api_utils.js');
 
 const userSample = {
   channel: {
@@ -47,6 +47,6 @@ const url_id_pair = [
 
 url_id_pair.forEach((pair) => {
   test(`${pair[0]} -> ${pair[1]}`, () => {
-    expect(main.getVideoIdfromVideoURL(pair[0])).toBe(pair[1]);
+    expect(main.extractVideoId(pair[0])).toBe(pair[1]);
   });
 });
